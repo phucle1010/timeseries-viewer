@@ -1,5 +1,4 @@
-import { getSortingStateParser } from "@/lib/helpers/data-table";
-import type { ExtendedColumnSort } from "@/types/data-table";
+import { useCallback, useMemo, useState } from "react";
 import {
   type ColumnFiltersState,
   getCoreRowModel,
@@ -20,7 +19,7 @@ import {
   type ColumnPinningState,
 } from "@tanstack/react-table";
 import {
-  type Parser,
+  type SingleParser,
   parseAsInteger,
   parseAsArrayOf,
   parseAsString,
@@ -28,7 +27,10 @@ import {
   useQueryState,
   useQueryStates,
 } from "nuqs";
-import { useCallback, useMemo, useState } from "react";
+
+import type { ExtendedColumnSort } from "@/types/data-table";
+
+import { getSortingStateParser } from "@/lib/helpers/data-table";
 
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { dataTableConfig } from "@/lib/configs/data-table";
@@ -167,7 +169,7 @@ export const useDataTable = <TData>(props: UseDataTableProps<TData>) => {
   }, [columns]);
 
   const filterParsers = useMemo(() => {
-    return filterableColumns.reduce<Record<string, Parser<string> | Parser<string[]>>>(
+    return filterableColumns.reduce<Record<string, SingleParser<string> | SingleParser<string[]>>>(
       (acc, column) => {
         if (column.meta?.options && column.meta?.variant === "multiSelect") {
           acc[column.id ?? ""] = parseAsArrayOf(parseAsString, ARRAY_SEPARATOR).withOptions(
