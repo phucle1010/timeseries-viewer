@@ -1,25 +1,33 @@
-import { useState } from "react";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import React from "react";
+
+import type { StockData } from "@/types/stock-data";
+
+import { createPeerComparisonColumns } from "@/components/features/peer/comparsion/columns";
+import { PeerComparisonTable } from "@/components/features/peer/comparsion";
+
+import { useDataTable } from "@/hooks/use-data-table";
+import stockData from "@/data/data.json";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const data = React.useMemo(() => stockData as StockData[], []);
+
+  const columns = React.useMemo(() => createPeerComparisonColumns(), []);
+
+  const { table } = useDataTable<StockData>({
+    data,
+    columns,
+    getRowId: (row) => row.symbolCode,
+    pageCount: 1,
+    rowCount: data.length,
+  });
 
   return (
-    <div className="min-h-screen">
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+    <div className="min-h-screen bg-neutral-100 px-6 py-12 dark:bg-black">
+      <main className="mx-auto w-full max-w-6xl">
+        <PeerComparisonTable table={table} />
+
+        {/* Lightweight chart */}
+      </main>
     </div>
   );
 }
